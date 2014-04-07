@@ -16,9 +16,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FITS.  If not, see <http://www.gnu.org/licenses/>.
  */
-package pt.keep.validator.utils;
+package pt.keep.validator.cdr.utils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 
 class StreamGobbler extends Thread {
 	private InputStream is;
@@ -55,7 +60,7 @@ class StreamGobbler extends Thread {
 			if (pw != null)
 				pw.flush();
 		} catch (IOException ioe) {
-			ioe.printStackTrace();
+			//ioe.printStackTrace();
 		}
 	}
 }

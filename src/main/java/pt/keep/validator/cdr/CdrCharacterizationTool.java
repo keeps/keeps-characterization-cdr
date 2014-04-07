@@ -1,5 +1,6 @@
-package pt.keep.validator;
+package pt.keep.validator.cdr;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,17 +19,16 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 
-import pt.keep.validator.results.Result;
-import pt.keep.validator.utils.CommandLine;
+import pt.keep.validator.cdr.results.Result;
+import pt.keep.validator.cdr.utils.CommandLine;
 
-
-/**
- * Hello world!
- *
- */
 public class CdrCharacterizationTool 
 {
-	private static String version = "1.0";
+	private String version = "1.0";
+	
+	public String getVersion(){
+		return version;
+	}
 	
 	public boolean isUniconvertoInstalled(){
 		boolean installed=false;
@@ -50,8 +50,18 @@ public class CdrCharacterizationTool
 		return installed;
 	}
 	
+	public boolean isCdrToolsInstalled(){
+      boolean installed=false;
+      try{
+          String execOut = CommandLine.exec(Arrays.asList("cdr2raw"),null);
+          return true;
+      }catch(IOException e){
+      }
+      return installed;
+  }
 	
-	public void run(File f) throws IOException, JAXBException{
+	
+	public String run(File f) throws IOException, JAXBException{
 		if(isUniconvertoInstalled() && isImageMagickInstalled()){
 			List<String> command = new ArrayList<String>(Arrays.asList("identify", "-verbose",f.getPath()));
 			String identifyOutput = CommandLine.exec(command, null);
@@ -60,7 +70,6 @@ public class CdrCharacterizationTool
 			res.setValid(false);
 			res.setFeatures(new Hashtable<String, String>());
 			try{
-				
 				Map<String,String> properties = extractMetadata(identifyOutput);
 				if(properties.containsKey("Format") && properties.get("Format").equalsIgnoreCase("cdr")){
 					res.setValid(true);
@@ -72,13 +81,25 @@ public class CdrCharacterizationTool
 			}catch(Exception e){
 				
 			}
-			
+			try{
+			  if(isCdrToolsInstalled()){
+                List<String> cdr2rawCommand = new ArrayList<String>(Arrays.asList("cdr2raw",f.getPath()));
+                String cdr2rawOutput = CommandLine.exec(cdr2rawCommand, null);
+                if(!cdr2rawOutput.toUpperCase().contains("ERROR:")){
+                  res.setValid(true);
+                }
+              }
+			}catch(Exception e){
+			  //e.printStackTrace();
+			}
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			JAXBContext jaxbContext = JAXBContext.newInstance(Result.class);
 			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			jaxbMarshaller.marshal(res, System.out);
-			
+			jaxbMarshaller.marshal(res, bos);
+			return bos.toString("UTF-8");
 		}
+		return null;
 	}
 	
 	private Map<String, String> extractMetadata(String identifyOutput) {
@@ -167,9 +188,12 @@ public class CdrCharacterizationTool
 				System.out.println("File doesn't exist");
 				System.exit(0);
 			}
-			cct.run(f);
+			String toolOutput = cct.run(f);
+			if(toolOutput!=null){
+				System.out.println(toolOutput);
+			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		
 		

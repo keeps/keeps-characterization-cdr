@@ -1,13 +1,12 @@
-package pt.keep.validator.results;
+package pt.keep.validator.cdr.results;
 
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import pt.keep.validator.utils.jaxb.*;
+import pt.keep.validator.cdr.utils.jaxb.MapAdapter;
 
 @XmlRootElement(name = "cdrCharacterizationResult")
 public class Result {

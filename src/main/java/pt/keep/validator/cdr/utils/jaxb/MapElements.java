@@ -1,4 +1,4 @@
-package pt.keep.validator.utils.jaxb;
+package pt.keep.validator.cdr.utils.jaxb;
 
 import javax.xml.bind.annotation.XmlElement;
 

@@ -25,7 +25,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>pt.keep.validator.CdrCharacterizationTool</mainClass>
+							<mainClass>pt.keep.validator.cdr.CdrCharacterizationTool</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
